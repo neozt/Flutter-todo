@@ -1,7 +1,7 @@
 # Todo App in Flutter
 
 ## Demo
-![Todo app demo](assets/demo.gif | width=200)
+![Todo app demo](assets/demo.gif)
 
 ## Features
 This todo app currently implements the following functionalities:
