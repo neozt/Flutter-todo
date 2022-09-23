@@ -1,4 +1,5 @@
 # Todo App in Flutter
+Simple todo app with recycle bin written in Flutter.
 
 ## Demo
 ![Todo app demo](assets/demo.gif)
