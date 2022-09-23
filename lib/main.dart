@@ -30,9 +30,8 @@ class ToDoList extends StatefulWidget {
 }
 
 class _ToDoListState extends State<ToDoList> {
-  final _todos = <String>[];
-  final _deleted = <String>[];
-  final _completed = <String>{};
+  final _todos = <TodoEntry>[];
+  final _deleted = <TodoEntry>[];
   final _biggerFont = const TextStyle(fontSize: 18);
   final _strikedThroughFont =
       const TextStyle(fontSize: 18, decoration: TextDecoration.lineThrough);
@@ -40,14 +39,30 @@ class _ToDoListState extends State<ToDoList> {
   void _showDeleted() {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (context) {
       // Render tiles in reversed order so that most recently deleted entries appead at the top
-      final tiles = _deleted.reversed.map((todo) {
-        return ListTile(
-          title: Text(
-            todo,
-            style: _biggerFont,
+      final tiles = <ListTile>[];
+      for (var i = _deleted.length - 1; i >= 0; i--) {
+        final entry = _deleted[i];
+        tiles.add(
+          ListTile(
+            title: Text(
+              entry.content,
+              style: entry.isCompleted ? _strikedThroughFont : _biggerFont,
+            ),
+            trailing: IconButton(
+              icon: const Icon(
+                Icons.restart_alt,
+                semanticLabel: 'Restore',
+              ),
+              onPressed: () {
+                _restore(i);
+                // Manually re-render deleted page to update
+                Navigator.of(context).pop();
+                _showDeleted();
+              },
+            ),
           ),
         );
-      });
+      }
       final divided = tiles.isNotEmpty
           ? ListTile.divideTiles(
               context: context,
@@ -88,12 +103,12 @@ class _ToDoListState extends State<ToDoList> {
             }
 
             final index = i ~/ 2;
-            final isActive = !_completed.contains(_todos[index]);
+            final entry = _todos[index];
 
             return ListTile(
               title: Text(
-                _todos[index],
-                style: isActive ? _biggerFont : _strikedThroughFont,
+                entry.content,
+                style: entry.isCompleted ? _strikedThroughFont : _biggerFont,
               ),
               trailing: IconButton(
                 icon: const Icon(
@@ -106,11 +121,12 @@ class _ToDoListState extends State<ToDoList> {
               ),
               leading: IconButton(
                   icon: Icon(
-                    isActive
-                        ? Icons.check_box_outline_blank_rounded
-                        : Icons.check_box_rounded,
-                    semanticLabel:
-                        isActive ? 'Mark as completed' : 'Mark as uncompleted',
+                    entry.isCompleted
+                        ? Icons.check_box_rounded
+                        : Icons.check_box_outline_blank_rounded,
+                    semanticLabel: entry.isCompleted
+                        ? 'Mark as uncompleted'
+                        : 'Mark as completed',
                   ),
                   onPressed: () {
                     _toggleActive(index);
@@ -172,17 +188,18 @@ class _ToDoListState extends State<ToDoList> {
     });
   }
 
+  /// Un-delete todo at index i of _deleted
+  void _restore(int i) {
+    setState(() {
+      _todos.add(_deleted[i]);
+      _deleted.removeAt(i);
+    });
+  }
+
   /// Toggle status of todo at index i between completed and active.
   void _toggleActive(int i) {
     setState(() {
-      var isCompleted = _completed.contains(_todos[i]);
-      if (isCompleted) {
-        // Mark as active
-        _completed.remove(_todos[i]);
-      } else {
-        // Mark as completed
-        _completed.add(_todos[i]);
-      }
+      _todos[i].toggleStatus();
     });
   }
 
@@ -193,7 +210,18 @@ class _ToDoListState extends State<ToDoList> {
 
   void _addTodo(String todo) {
     setState(() {
-      _todos.add(todo);
+      _todos.add(TodoEntry(todo));
     });
+  }
+}
+
+class TodoEntry {
+  String content;
+  bool isCompleted;
+
+  TodoEntry(this.content, [this.isCompleted = false]);
+
+  void toggleStatus() {
+    isCompleted = !isCompleted;
   }
 }
