@@ -12,6 +12,6 @@ This todo app currently implements the following functionalities:
 - View deleted todos
 
 #### Todo for Todo App (Future updates)
-- [ ] Sort deleted todos by most recently deleted
-- [ ] Restore deleted todos
-- [ ] Indicate whether deleted todos were completed prior to deletion
+- [x] Sort deleted todos by most recently deleted
+- [x] Restore deleted todos
+- [x] Indicate whether deleted todos were completed prior to deletion
