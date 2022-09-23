@@ -39,7 +39,8 @@ class _ToDoListState extends State<ToDoList> {
 
   void _showDeleted() {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (context) {
-      final tiles = _deleted.map((todo) {
+      // Render tiles in reversed order so that most recently deleted entries appead at the top
+      final tiles = _deleted.reversed.map((todo) {
         return ListTile(
           title: Text(
             todo,
